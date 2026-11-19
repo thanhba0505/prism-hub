@@ -1,0 +1,12 @@
+[submodule "services/wonderlab"]
+	path = services/wonderlab
+	url = git@github.com:thanhba0505/wonderlab.git
+	branch = develop
+[submodule "services/central-gateway"]
+	path = services/central-gateway
+	url = git@github.com:thanhba0505/central-gateway.git
+	branch = develop
+[submodule "services/git-pulse"]
+	path = services/git-pulse
+	url = git@github.com:thanhba0505/git-pulse.git
+	branch = develop
