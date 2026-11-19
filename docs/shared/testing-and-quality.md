@@ -13,7 +13,7 @@
 - **Clean Architecture**:
   - Guard clauses with early returns (maximum 2 levels of nesting), single-purpose helpers, zero duplicated logic.
   - ESLint enforced with `--max-warnings 0`; code formatted consistently via Prettier (`singleQuote: true`, `tabWidth: 2`, `printWidth: 100`).
-  - Zero-layout-shift scrollbars across all frontends via `scrollbar-gutter: stable` on root/scroll containers (`html`, `.custom-scrollbar`, `.gp-scroll-area`, `.overflow-y-auto`), paired with WCAG 1.4.11 (`>= 3:1`) `scrollbar-color` tokens and `@media (prefers-contrast: more)` overrides.
+  - Zero-layout-shift symmetric scrollbars across all frontends via `scrollbar-gutter: stable both-edges` and ultra-slim `5px` `::-webkit-scrollbar` pills on root/scroll containers (`html`, `.custom-scrollbar`, `.gp-scroll-area`, `.overflow-y-auto`), paired with WCAG 1.4.11 (`>= 3:1`) contrast tokens, `@media (prefers-contrast: more)` overrides, and `@supports not selector(::-webkit-scrollbar)` Firefox fallbacks.
 
 ---
 
