@@ -29,4 +29,4 @@ Applies to `services/git-pulse/client/`. Brand name is strictly **`Git Pulse`** 
 
 - **Primitives**: Reuse `ShowcaseCard`, `DropdownMenu`, `Select`, `Input`, `SegmentedControl`, and native `<dialog>` (`ModalDialog`) in `client/src/components/ui/`.
 - **Viewport Shell**: `h-screen overflow-hidden` desktop shell with pinned header, inner `custom-scrollbar` container, and pinned footer.
-- **WebLLM & i18n**: Dynamic `import('@mlc-ai/web-llm')` inside engine worker with on-demand modal consent. Full `vi`/`en` UI dictionary (`src/lib/i18n.ts`) decoupled from AI report language (`aiLanguage`).
+- **AI Console & i18n**: Select-based AI provider console (`GitHub Models`, connected `Google Gemini (<label>)` connections, `+ Add` modal trigger) with live model availability verification; full `vi`/`en` UI dictionary (`src/lib/i18n.ts`) decoupled from AI report language (`aiLanguage`).

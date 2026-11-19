@@ -33,10 +33,10 @@ When a developer connects a GitHub Personal Access Token or OAuth credential:
 
 All logger streams, exception filters, and telemetry pipelines employ automated regex redaction to intercept and sanitize accidental token leaks:
 
-- **Classic GitHub Tokens**: `ghp_[a-zA-Z0-9]{36}` -> `[REDACTED_GH_TOKEN]`
-- **Fine-Grained PATs**: `github_pat_[a-zA-Z0-9_]{82}` -> `[REDACTED_GH_PAT]`
-- **OAuth Access Tokens**: `gho_[a-zA-Z0-9]{36}` -> `[REDACTED_GH_OAUTH]`
-- **Bearer Tokens**: `Bearer [a-zA-Z0-9\-._~+/]+=*` -> `Bearer [REDACTED]`
+- **Classic GitHub Tokens**: `ghp_[a-zA-Z0-9]{36}` -> `[REDACTED_GITHUB_TOKEN]`
+- **Fine-Grained PATs**: `github_pat_[a-zA-Z0-9_]{82}` -> `[REDACTED_GITHUB_TOKEN]`
+- **OAuth Access Tokens**: `gho_[a-zA-Z0-9]{36}` -> `[REDACTED_GITHUB_TOKEN]`
+- **Personal AI Keys (`AIza...`, `sk-...`, `gsk_...`)**: Replaced with `[REDACTED_AI_KEY]` before logs or HTTP error responses.
 
 ---
 

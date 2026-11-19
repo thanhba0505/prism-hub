@@ -124,11 +124,32 @@ Fetches pull requests, issues, and commit history across developer's contributed
 
 ---
 
-## 4. Dual-Core AI Engines
+## 4. AI Providers, BYOK Vault & Availability Probing
+
+### `GET /ai/connections`
+
+Lists the authenticated user's saved personal AI provider connections (masked keys and live discovered model catalogs only; never returns plaintext keys).
+
+### `POST /ai/connections`
+
+Verifies a personal AI provider API key (currently `GOOGLE_GEMINI`) against Google AI Studio, extracts supported `generateContent` models, encrypts the key per-user with HKDF + AES-256-GCM, and stores it in `ai_connections`.
+
+**Rate Limit**: `@Throttle` 5 requests/min.
+
+### `PATCH /ai/connections/:id` & `DELETE /ai/connections/:id`
+
+Rotates/updates (`PATCH`, max 5 req/min) or deletes (`DELETE`) a saved personal AI connection owned by the user.
+
+### `POST /ai/check-availability`
+
+Performs a live, zero-generation-cost availability probe for the selected `{ engine, connectionId?, model }`:
+
+- **`GITHUB_MODELS`**: Verifies active GitHub token and checks `https://models.github.ai/catalog/models` JSON catalog availability.
+- **`GOOGLE_GEMINI`**: Verifies model metadata and probes `:countTokens`, automatically updating `status` (`ACTIVE` / `REVOKED`) in PostgreSQL.
 
 ### `POST /ai/summarize`
 
-Synthesizes daily standup bullets using the GitHub Models API directly with the user's decrypted GitHub token.
+Synthesizes daily standup bullets using the selected AI provider (`GITHUB_MODELS` or `GOOGLE_GEMINI`) and persists the result in `report_histories`.
 
 **Request Body**:
 
@@ -137,11 +158,13 @@ Synthesizes daily standup bullets using the GitHub Models API directly with the 
   "prs": [
     {
       "repo": "owner/repo",
-      "title": "feat: integrate vercel serverless",
-      "commits": ["chore: update docs", "feat: express adapter"]
+      "title": "feat: integrate personal gemini vault",
+      "commits": ["feat: add ai_connections", "test: add availability specs"]
     }
   ],
-  "model": "gpt-4o-mini",
+  "engine": "GOOGLE_GEMINI",
+  "connectionId": "uuid-connection-id",
+  "model": "gemini-2.5-flash",
   "tone": "STANDUP_BULLETS",
   "language": "vi",
   "customPrompt": ""
@@ -152,19 +175,16 @@ Synthesizes daily standup bullets using the GitHub Models API directly with the 
 
 ```json
 {
+  "success": true,
   "bullets": [
-    "Hoàn tất tích hợp Vercel Serverless Function entry point.",
-    "Tối ưu hóa pipeline CI/CD và xác thực tự động trên GitHub Actions."
+    "Tích hợp AI Provider Vault hỗ trợ kết nối Google Gemini API Key cá nhân.",
+    "Bổ sung kiểm tra trạng thái khả dụng mô hình theo thời gian thực."
   ],
   "rawText": "...",
-  "modelUsed": "gpt-4o-mini",
-  "engine": "GITHUB_MODELS"
+  "modelUsed": "gemini-2.5-flash",
+  "engine": "GOOGLE_GEMINI"
 }
 ```
-
-### `POST /ai/save-client-summary`
-
-Persists standup report generated locally in the browser by WebLLM (WebGPU).
 
 ---
 

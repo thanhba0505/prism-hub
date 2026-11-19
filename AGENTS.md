@@ -117,13 +117,13 @@ Refer to [`.agents/skills/gateway-frontend-design/SKILL.md`](.agents/skills/gate
 Refer to [`.agents/skills/gitpulse-frontend-design/SKILL.md`](.agents/skills/gitpulse-frontend-design/SKILL.md) and [`docs/git-pulse/`](docs/git-pulse/architecture.md).
 
 - **Brand Naming**: Strictly named **`Git Pulse`** (spaced, never `Git-Pulse`).
-- **Token Vault & Cryptographic Security**:
-  - GitHub PATs & OAuth tokens encrypted at rest via **AES-256-GCM** + **Per-User HKDF (`crypto.hkdfSync`)** (`keyVersion` rotation, production fail-fast `ENCRYPTION_KEY`/`GITHUB_TOKEN_ENCRYPTION_KEY`).
-  - Automatic over-privileged scope detection (`delete_repo`, `admin:org`), Fine-Grained PAT `expiresAt` tracking, zero-leak regex redaction (`ghp_`, `github_pat_`, `gho_`), immutable `token_audit_logs`, and `@Throttle` (max 5 req/min) on PAT/OAuth routes.
+- **Token & AI Key Vault Cryptographic Security**:
+  - GitHub PATs/OAuth tokens (`git_accounts`) and personal AI provider keys (`ai_connections`, e.g., Google Gemini) encrypted at rest via **AES-256-GCM** + **Per-User HKDF (`crypto.hkdfSync`)** (`keyVersion` rotation, production fail-fast `ENCRYPTION_KEY`/`GITHUB_TOKEN_ENCRYPTION_KEY`).
+  - Automatic over-privileged scope detection (`delete_repo`, `admin:org`), Fine-Grained PAT `expiresAt` tracking, zero-leak regex redaction (`ghp_`, `github_pat_`, `gho_`, `AIza...`, `sk-...`, `gsk_...`), immutable `token_audit_logs`, and `@Throttle` (max 5 req/min) on PAT/OAuth/AI-key routes.
 - **UI Standard ("Precision Developer Dark")**:
   - Tailwind Cool Slate Elevated surfaces over `#0F172A` (`slate-900`) canvas: `.gp-card` (`#1E293B` / `rgba(30,41,59,0.86)`), `.gp-modal-surface`, `.gp-glass-panel`, elevated nested `#273549`, recessed `#152033` inputs, crisp `#334155` borders, `#94A3B8` muted text, `Sky-500` (`#0EA5E9`) primary accent; `Plus Jakarta Sans`, `Inter`, `JetBrains Mono`.
   - Interactive pointer-driven `InteractiveBackdrop` (deactivates cleanly on pointer exit) paired with Pause/Play ambient motion toggle (`useAmbientMotionPreference`) and `IntroScreen`. Strictly forbid idle continuous RAF starfields, scanline overlays, spinning logos, radar/sci-fi jargon, internal crypto boasting, or native `window.alert()` / `window.confirm()`.
-  - Standard primitives (`ShowcaseCard`, `DropdownMenu`, `Select`, `Input`, `SegmentedControl`, `<dialog>` `ModalDialog`), pinned header + inner `custom-scrollbar` + footer shell, dynamic WebLLM (`@mlc-ai/web-llm`) + modal loading, full `vi`/`en` UI i18n decoupled from AI report language.
+  - Standard primitives (`ShowcaseCard`, `DropdownMenu`, `Select`, `Input`, `SegmentedControl`, `<dialog>` `ModalDialog`), pinned header + inner `custom-scrollbar` + footer shell, select-driven AI provider console (`GitHub Models`, personal `Google Gemini` BYOK connections, live availability verification — no WebLLM), full `vi`/`en` UI i18n decoupled from AI report language.
 
 ---
 

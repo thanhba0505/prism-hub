@@ -9,9 +9,8 @@ graph TD
     Edge --> ServerAPI["git-pulse-server (NestJS 10 on Vercel Serverless)"]
     ServerAPI -->|Pooled Connection| NeonDB["Neon Lakebase PostgreSQL 16 (AWS Oregon)"]
     ServerAPI -->|HMAC-SHA256 S2S| Gateway["Central Gateway (IAM Master & SSO)"]
-    ClientApp -->|In-Browser WebGPU| WebLLM["Local WebLLM Core (Llama-3.2-1B / Qwen2.5)"]
-    ServerAPI -->|Decrypted Token| GitHubAPI["GitHub REST & GraphQL API"]
-    ServerAPI -->|Decrypted Token| GitHubModels["GitHub Models Frontier AI (Azure Inference)"]
+    ServerAPI -->|Decrypted Token| GitHubAPI["GitHub REST & Models API"]
+    ServerAPI -->|Decrypted BYOK Key| GeminiAPI["Google Gemini API (v1beta)"]
 ```
 
 ---
@@ -72,13 +71,13 @@ Cross-service communication between Git Pulse, Central Gateway, and Wonderlab en
 
 ---
 
-## 3. Dual-Core AI Architecture
+## 3. Configurable AI Providers & Personal BYOK Vault
 
-Git Pulse introduces a Dual-Engine AI system that incurs **Zero Server Compute Costs**:
+Git Pulse supports pluggable AI providers with **Zero Server Compute Costs** and live pre-flight model availability checks:
 
-1. **GitHub Models (Cloud)**:
-   - Dispatches inference requests directly to `https://models.inference.ai.azure.com/chat/completions` using the developer's decrypted GitHub token.
-   - Supported models: `gpt-4o-mini`, `meta-llama-3.3-70b-instruct`.
-2. **WebLLM (In-Browser WebGPU)**:
-   - Executes quantized models (`Llama-3.2-1B-Instruct-q4f16_1-MLC`, `Qwen2.5-Coder-1.5B`) directly inside the user's browser via WebGPU using `@mlc-ai/web-llm`.
-   - 100% private, client-side, zero token usage, functional offline.
+1. **GitHub Models (Built-in Option)**:
+   - Targets `https://models.github.ai/catalog/models` and `/inference/chat/completions` using the developer's active GitHub token.
+   - Live availability checks verify JSON catalog responses and flag retired/unauthorized status inline.
+2. **Google Gemini (Personal BYOK Vault in `ai_connections`)**:
+   - Users connect personal Google AI Studio keys (`AIza...`) via `POST /api/v1/ai/connections`, encrypted per-user with **AES-256-GCM + HKDF-SHA256** (`CryptoService`) and displayed in the UI as `Google Gemini (<label>)`.
+   - Live model discovery (`GET /v1beta/models`) filters active text-generation models and runtime availability probes (`GET /v1beta/models/{model}` + `:countTokens`) verify key validity and quota whenever the user selects a provider/model.
