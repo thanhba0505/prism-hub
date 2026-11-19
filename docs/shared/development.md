@@ -53,7 +53,7 @@ make init
 | `make start`                                            | Start DB + all 6 dev apps concurrently (`Ctrl+C` stops all child processes cleanly)            |
 | `make start-clients` / `make start-servers`             | Start only all 3 Next.js frontends OR only all 3 NestJS backends                               |
 | `make stop`                                             | Terminate listeners occupying dev ports `4100,4101,5100,5101,6100,6101`                        |
-| `make check`                                            | Execute full `pnpm check` sequentially across all 3 repositories                               |
+| `make check`                                            | Execute `pnpm check` (format, lint, typecheck, tests — excluding build) across all 3 repos     |
 | `make lint` / `typecheck` / `test` / `build` / `format` | Run target script across all 3 repositories                                                    |
 | `make clean`                                            | Delete `client/.next` and `server/dist` caches across all 3 repositories                       |
 
@@ -68,7 +68,7 @@ make init
 | `make <svc>-migrate [NAME=...]`                                                     | Verify local DB -> run `prisma migrate dev` after editing `schema.prisma`                        |
 | `make <svc>-seed` / `<svc>-studio`                                                  | Verify local DB -> run `db:seed` or open Prisma Studio                                           |
 | `make <svc>-db-generate`                                                            | Regenerate Prisma Client without touching the database                                           |
-| `make <svc>-check`                                                                  | Run full verification suite (`format:check`, `lint`, `typecheck`, `test`, [`test:e2e`], `build`) |
+| `make <svc>-check`                                                                  | Run verification suite (`format:check`, `lint`, `typecheck`, `test`, [`test:e2e`] — no build)  |
 | `make <svc>-test-e2e`                                                               | (`wonderlab` only) Verify local DB + execute Supertest E2E suite                                 |
 | `make <svc>-lint` / `typecheck` / `test` / `build` / `format` / `install` / `clean` | Run targeted maintenance or build checks inside `services/<svc>`                                 |
 
@@ -80,5 +80,5 @@ make init
 > **STRICTLY FORBID running `pnpm start` or `next start` for local development.**
 
 - Always start development frontends via `make <svc>-start` / `make <svc>-start-client` (`next dev`).
-- Running `next start` pins Next.js to an in-memory production `BUILD_ID`. Any concurrent `make check` or `pnpm build` rewrites `.next/` on disk, causing `400 Bad Request` asset lockouts and unstyled pages.
+- Running `next start` pins Next.js to an in-memory production `BUILD_ID`. Any concurrent `make build` or `pnpm build` rewrites `.next/` on disk, causing `400 Bad Request` asset lockouts and unstyled pages.
 - `next dev` recompiles cleanly on demand and avoids build-ID desynchronization.

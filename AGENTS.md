@@ -71,11 +71,12 @@ Authoritative engineering rulebook for AI coding assistants operating anywhere i
   - **`useRef` for High-Frequency State**: Store animation handles, Canvas contexts, workers, and iteration counters in `useRef`, throttling React state updates.
   - **Component Granularity**: Split controls from heavy canvas/data siblings; stabilize callbacks passed to `React.memo` children via `useCallback`.
 - **Unified Verification (`make <svc>-check` / `pnpm check`)**:
-  - Always run full `format:check`, `lint` (`--max-warnings 0`), `typecheck`, `test`, (`test:e2e` for Wonderlab), and `build` before claiming completion.
+  - Always run `pnpm check` (`format:check`, `lint` `--max-warnings 0`, `typecheck`, `test`, plus `test:e2e` for Wonderlab) before claiming completion.
+  - Keep `pnpm build` / `make <svc>-build` separate from `pnpm check` so local verification stays fast and never rewrites `.next/` while `next dev` is running; run explicit `pnpm build` only when verifying production packaging or before releases (CI runs its own isolated `build` job).
   - Follow lean, core-only testing (`docs/shared/testing-and-quality.md`): test math engines, security/crypto logic, auth/permissions, and high-value E2E; forbid bloat unit tests for UI wrappers, static dictionaries, or pass-through mocks.
 - **Dev Server Standard (`pnpm dev` Only)**:
   - **STRICTLY run `pnpm dev` / `pnpm dev:client` / `pnpm dev:server`** (or `make start` / `make <svc>-start`).
-  - **NEVER run `pnpm start` or `next start`** locally — `next start` locks to an immutable `BUILD_ID` and breaks styles/chunks (`400 Bad Request`) whenever `pnpm check` or `next build` updates `.next/`.
+  - **NEVER run `pnpm start` or `next start`** locally — `next start` locks to an immutable `BUILD_ID` and breaks styles/chunks (`400 Bad Request`) whenever `pnpm build` or `next build` updates `.next/`.
 
 ---
 

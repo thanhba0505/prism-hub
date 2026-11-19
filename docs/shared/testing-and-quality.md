@@ -49,4 +49,4 @@ Before committing or pushing directly to `develop` inside any service:
 make <service>-check   # or pnpm check inside services/<service>
 ```
 
-Executes in fail-fast order: `format:check` -> `lint` -> `typecheck` -> `test` -> (`test:e2e` on Wonderlab) -> `build`.
+Executes in fail-fast order: `format:check` -> `lint` -> `typecheck` -> `test` (-> `test:e2e` on Wonderlab). Production builds (`pnpm build` / `make <service>-build`) run separately so local verification stays fast and never overwrites `.next/` under `next dev`.
