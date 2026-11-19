@@ -136,6 +136,18 @@ Verifies a personal AI provider API key (currently `GOOGLE_GEMINI`) against Goog
 
 **Rate Limit**: `@Throttle` 5 requests/min.
 
+### `POST /ai/preview-models`
+
+Validates an unsaved AI provider API key live and returns the discovered list of available models (`valid`, `maskedKey`, `models`) without persisting anything to the database.
+
+**Rate Limit**: `@Throttle` 10 requests/min.
+
+### `POST /ai/connections/:id/refresh-models`
+
+Decrypts a saved AI connection key, fetches the latest live model catalog from the provider API, and refreshes `availableModels` and `lastVerifiedAt` (marking `REVOKED` if the token is rejected).
+
+**Rate Limit**: `@Throttle` 10 requests/min.
+
 ### `PATCH /ai/connections/:id` & `DELETE /ai/connections/:id`
 
 Rotates/updates (`PATCH`, max 5 req/min) or deletes (`DELETE`) a saved personal AI connection owned by the user.
@@ -144,7 +156,7 @@ Rotates/updates (`PATCH`, max 5 req/min) or deletes (`DELETE`) a saved personal 
 
 Performs a live, zero-generation-cost availability probe for the selected `{ engine, connectionId?, model }`:
 
-- **`GITHUB_MODELS`**: Verifies active GitHub token and checks `https://models.github.ai/catalog/models` JSON catalog availability.
+- **`GITHUB_MODELS`**: Verifies active GitHub token, checks `https://models.github.ai/catalog/models` JSON catalog availability, and returns `availableModels` dynamically when JSON catalog data is returned.
 - **`GOOGLE_GEMINI`**: Verifies model metadata and probes `:countTokens`, automatically updating `status` (`ACTIVE` / `REVOKED`) in PostgreSQL.
 
 ### `POST /ai/summarize`
