@@ -154,10 +154,10 @@ Rotates/updates (`PATCH`, max 5 req/min) or deletes (`DELETE`) a saved personal 
 
 ### `POST /ai/check-availability`
 
-Performs a live, zero-generation-cost availability probe for the selected `{ engine, connectionId?, model }`:
+Performs a live, lightweight availability probe for the selected `{ engine, connectionId?, model }`:
 
 - **`GITHUB_MODELS`**: Verifies active GitHub token, checks `https://models.github.ai/catalog/models` JSON catalog availability, and returns `availableModels` dynamically when JSON catalog data is returned.
-- **`GOOGLE_GEMINI`**: Verifies model metadata and probes `:countTokens`, automatically updating `status` (`ACTIVE` / `REVOKED`) in PostgreSQL.
+- **`GOOGLE_GEMINI`**: Verifies model metadata (`GET /models/{model}`) and sends a minimal 1-token `:generateContent` (`maxOutputTokens: 1`) readiness probe so Free Tier `limit: 0` quota, `404` model removals, `503` overload, and slow/timeout endpoints are detected before summarization (marking `REVOKED` only on `401`/`403` or invalid-key `400`).
 
 ### `POST /ai/summarize`
 
