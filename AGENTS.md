@@ -58,6 +58,9 @@ Authoritative engineering rulebook for AI coding assistants operating anywhere i
   - Forbidden: `any`, `Record<string, any>`, `Array<any>`, `@ts-ignore`, `@ts-nocheck`.
   - Use `unknown` + runtime narrowing / type guards or constrained generics `<T extends Record<string, unknown>>`.
 - **Explicit Contracts & Null Safety**: Define explicit interfaces/DTOs for all domain entities, props, state, and endpoints. Handle optionality via `?.`, `??`, or guard clauses; avoid `!`.
+- **NestJS & Next.js Conventions**:
+  - **NestJS Backends**: Global `/api/v1` prefix, `GET /api/v1/health`, `/api/docs` Swagger (dev), global `ValidationPipe` (`whitelist: true, forbidNonWhitelisted: true, transform: true`), and `class-validator` DTOs.
+  - **Next.js Frontends**: App Router (`src/app/(public)/`, `src/app/admin/`), default to React Server Components (`'use client'` strictly for hooks/events/browser APIs), `@/` path alias.
 - **Clean Code**: Guard clauses, early returns (max 2 levels of nesting), single-purpose functions, zero duplicate logic, grouped imports.
 - **Minimum Font Size (`>= 12px`) Across ALL Apps**: Strictly forbid text smaller than `12px` (`text-xs`). Never use `text-[11px]`, `text-[10px]`, `text-[8px]`, etc.
 - **React Anti-Re-render Standard**:
