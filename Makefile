@@ -95,12 +95,15 @@ format: $(addsuffix -format,$(SERVICES))
 clean: $(addsuffix -clean,$(SERVICES))
 
 start: db-up
+	@./scripts/stop.sh
 	@node ./scripts/dev-all.mjs --mode=all
 
 start-clients:
+	@./scripts/stop.sh
 	@node ./scripts/dev-all.mjs --mode=clients
 
 start-servers: db-up
+	@./scripts/stop.sh
 	@node ./scripts/dev-all.mjs --mode=servers
 
 stop:
