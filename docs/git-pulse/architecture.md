@@ -75,9 +75,14 @@ Cross-service communication between Git Pulse, Central Gateway, and Wonderlab en
 
 Git Pulse supports pluggable AI providers with **Zero Server Compute Costs** and live pre-flight model availability checks:
 
-1. **GitHub Models (Built-in Option)**:
-   - Targets `https://models.github.ai/catalog/models` and `/inference/chat/completions` using the developer's active GitHub token.
-   - Live availability checks verify JSON catalog responses and flag retired/unauthorized status inline.
+1. **Groq Cloud (Recommended Personal BYOK Vault in `ai_connections`)**:
+   - High-speed LPU inference with 100% free tier (no credit card or Google Cloud billing required).
+   - Users connect personal Groq API keys (`gsk_...` from `https://console.groq.com/keys`) via `POST /api/v1/ai/connections`, encrypted per-user with **AES-256-GCM + HKDF-SHA256** (`CryptoService`) and displayed in the UI as `Groq Cloud (<label>)`.
+   - Models include `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768`.
+   - Live availability checks target `https://api.groq.com/openai/v1/chat/completions` with 1-token probes and live model synchronization via `/models`.
 2. **Google Gemini (Personal BYOK Vault in `ai_connections`)**:
    - Users connect personal Google AI Studio keys (`AIza...` or `AQ...`) via `POST /api/v1/ai/connections`, encrypted per-user with **AES-256-GCM + HKDF-SHA256** (`CryptoService`) and displayed in the UI as `Google Gemini (<label>)`.
    - Live model discovery (`GET /v1beta/models`) filters active standup text-generation models (prioritizing verified GA Flash/Flash-Lite tiers) and runtime availability probes (`GET /v1beta/models/{model}` + minimal 1-token `:generateContent`) verify key validity, Free Tier `limit: 0` quota, and model responsiveness whenever the user selects a provider/model.
+3. **GitHub Models (Built-in Option)**:
+   - Targets `https://models.github.ai/catalog/models` and `/inference/chat/completions` using the developer's active GitHub token.
+   - Live availability checks verify JSON catalog responses and flag retired/unauthorized status inline.
