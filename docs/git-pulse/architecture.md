@@ -83,6 +83,24 @@ Git Pulse supports pluggable AI providers with **Zero Server Compute Costs** and
 2. **Google Gemini (Personal BYOK Vault in `ai_connections`)**:
    - Users connect personal Google AI Studio keys (`AIza...` or `AQ...`) via `POST /api/v1/ai/connections`, encrypted per-user with **AES-256-GCM + HKDF-SHA256** (`CryptoService`) and displayed in the UI as `Google Gemini (<label>)`.
    - Live model discovery (`GET /v1beta/models`) filters active standup text-generation models (prioritizing verified GA Flash/Flash-Lite tiers) and runtime availability probes (`GET /v1beta/models/{model}` + minimal 1-token `:generateContent`) verify key validity, Free Tier `limit: 0` quota, and model responsiveness whenever the user selects a provider/model.
-3. **GitHub Models (Built-in Option)**:
-   - Targets `https://models.github.ai/catalog/models` and `/inference/chat/completions` using the developer's active GitHub token.
-   - Live availability checks verify JSON catalog responses and flag retired/unauthorized status inline.
+3. **GitHub Models (Deprecated / Service Retired)**:
+   - Previously targeted `https://models.github.ai/catalog/models` and `/inference/chat/completions`.
+   - The service was officially retired by GitHub on July 30, 2026. Git Pulse availability check detects this status and cleanly notifies users to utilize Groq Cloud or Google Gemini.
+
+---
+
+## 4. Activity Scanner & Commit Selection Architecture
+
+Git Pulse features a streamlined, focused activity scanner and cockpit:
+
+1. **Three Focused Grouping Modes**:
+   - **Tất cả (All)**: Unified view organized by Personal activity and Organizations.
+   - **Theo Task (By Task)**: Groups activities under user-defined tracking tasks or unassigned backlog.
+   - **Theo Repo (By Repo)**: Groups activities alphabetically by repository.
+2. **Clean Activity Stream**:
+   - Direct activity cards (`PrActivityCard`) present PR and commit information without cluttering individual selection checkboxes.
+3. **Cockpit Commit Selector Modal (`CommitSelectionModal`)**:
+   - Opened directly from the `{count} commit đã chọn` trigger row above the `Tạo báo cáo` action button.
+   - Allows fine-grained inspection and checkbox toggling of individual commits grouped by PR/Repo.
+   - Persistent filter preferences: Checkboxes for **Cá nhân (Personal)** and **Tổ chức (Organization)** are stored in `localStorage` (`gitpulse:commit_filter:personal`, `gitpulse:commit_filter:org`) and automatically applied to new scans.
+   - The AI summarization pipeline (`api.ai.summarize`) filters PR activities strictly down to selected commits before prompt synthesis.
