@@ -37,6 +37,8 @@ All logger streams, exception filters, and telemetry pipelines employ automated 
 - **Fine-Grained PATs**: `github_pat_[a-zA-Z0-9_]{82}` -> `[REDACTED_GITHUB_TOKEN]`
 - **OAuth Access Tokens**: `gho_[a-zA-Z0-9]{36}` -> `[REDACTED_GITHUB_TOKEN]`
 - **Personal AI Keys (`AIza...`, `sk-...`, `gsk_...`)**: Replaced with `[REDACTED_AI_KEY]` before logs or HTTP error responses.
+- **Parabol / Bearer Tokens (`pbl_...`, `pat_...`, `Bearer ...`)**: Replaced with `[REDACTED_PARABOL_TOKEN]` / `Bearer [REDACTED_TOKEN]` before logs or HTTP error responses.
+- Parabol Personal Access Tokens in `parabol_connections` use the same **AES-256-GCM + Per-User HKDF-SHA256** encryption vault as `git_accounts` and `ai_connections`.
 
 ---
 
@@ -58,7 +60,12 @@ All token state transitions trigger immutable audit logs:
 | `PAT_SAVE`       | New token connected                      | IP address, User-Agent, Granted scopes, Expiry |
 | `ACTIVITY_FETCH` | Token decrypted for activity fetch       | IP address, User-Agent, Status                 |
 | `AI_SUMMARIZE`   | Token decrypted for AI synthesis         | Model name, PR count                           |
-| `DISCONNECT`     | Token permanently wiped                  | IP address, User-Agent                         |
-| `TOKEN_REVOKED`  | GitHub 401 detected, token auto-disabled | Timestamp, Failure reason                      |
+| `DISCONNECT`              | Token permanently wiped                  | IP address, User-Agent                         |
+| `TOKEN_REVOKED`           | GitHub 401 detected, token auto-disabled | Timestamp, Failure reason                      |
+| `PARABOL_PAT_VERIFY`       | Unsaved Parabol PAT validated live       | IP address, User-Agent, Status                 |
+| `PARABOL_PAT_SAVE`        | Parabol PAT verified and encrypted       | IP address, User-Agent, Status                 |
+| `AI_KEY_PREVIEW`          | Unsaved AI key validated live            | IP address, User-Agent, Provider               |
+| `PARABOL_STANDUP_SUBMIT`  | Standup response pushed to Parabol       | Meeting ID, Shared flag, Status                |
+| `PARABOL_DISCONNECT`      | Parabol PAT permanently wiped            | IP address, User-Agent                         |
 
 Sensitive token values are strictly excluded from audit metadata.

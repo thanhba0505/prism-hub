@@ -11,6 +11,7 @@ graph TD
     ServerAPI -->|HMAC-SHA256 S2S| Gateway["Central Gateway (IAM Master & SSO)"]
     ServerAPI -->|Decrypted Token| GitHubAPI["GitHub REST & Models API"]
     ServerAPI -->|Decrypted BYOK Key| GeminiAPI["Google Gemini API (v1beta)"]
+    ServerAPI -->|Decrypted Parabol PAT| ParabolAPI["Parabol GraphQL API"]
 ```
 
 ---
@@ -104,3 +105,18 @@ Git Pulse features a streamlined, focused activity scanner and cockpit:
    - Allows fine-grained inspection and checkbox toggling of individual commits grouped by PR/Repo.
    - Persistent filter preferences: Checkboxes for **Cá nhân (Personal)** and **Tổ chức (Organization)** are stored in `localStorage` (`gitpulse:commit_filter:personal`, `gitpulse:commit_filter:org`) and automatically applied to new scans.
    - The AI summarization pipeline (`api.ai.summarize`) filters PR activities strictly down to selected commits before prompt synthesis.
+
+---
+
+## 5. Parabol Daily Standup Integration (`parabol_connections`)
+
+Git Pulse integrates directly with **Parabol GraphQL API** (`https://action.parabol.co/graphql`) so developers can submit their generated Daily Report directly into an active Parabol Standup (`TeamPromptMeeting`):
+
+1. **Encrypted PAT Vault (`parabol_connections`)**:
+   - Users connect Parabol Personal Access Tokens (`pat_...` with `USERS_READ`, `TEAMS_READ`, `MEETINGS_READ`, `MEETINGS_WRITE`) via the unified **Workspace Settings** (`Nền tảng báo cáo công việc` tab) or `ReportPlatformConnectModal` stacked above Settings.
+   - `POST /api/v1/parabol/verify-token` auto-validates pasted tokens live, populates the suggested profile label & read-only expiration status, and encrypts saved tokens per-user with **AES-256-GCM + HKDF-SHA256** (`CryptoService`).
+   - Connected accounts preserve stable creation order (`createdAt ASC`) with single-click default selection (`PATCH /api/v1/parabol/connections/:id/active`).
+2. **Standup Discovery, Workspace UI & Direct Submission**:
+   - `GET /api/v1/parabol/standups` lists active `TeamPromptMeeting` instances across the user's Parabol teams (or resolves a pasted `https://action.parabol.co/meet/<id>` link), cached per connection for 30s.
+   - `POST /api/v1/parabol/standups/submit` serializes edited bullets (preserving `Today:` section framing) into Parabol's TipTap JSON format and calls `upsertTeamPromptResponse` (saving as a **Private Draft** by default, with an opt-in `shareImmediately` toggle that invokes `shareTeamPromptResponses`).
+   - **Standup Output & Global UX**: `StandupOutputDock` stays visible with inline content-area loading skeletons and configurable quick-delivery actions; `ToastProvider` promotes notifications into the Top Layer (`popover="manual"` + `showPopover()`) anchored at top-right above active `<dialog>` modals; `CommandPalette` (`⌘K`) exposes quick commands for Git scans, commit selection, AI provider switching, Parabol submission, and unified settings.

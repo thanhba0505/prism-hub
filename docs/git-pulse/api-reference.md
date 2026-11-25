@@ -132,13 +132,13 @@ Lists the authenticated user's saved personal AI provider connections (masked ke
 
 ### `POST /ai/connections`
 
-Verifies a personal AI provider API key (currently `GOOGLE_GEMINI`) against Google AI Studio, extracts supported `generateContent` models, encrypts the key per-user with HKDF + AES-256-GCM, and stores it in `ai_connections`.
+Verifies a personal AI provider API key (`GROQ` or `GOOGLE_GEMINI`) live, extracts supported text-generation models and any expiration metadata, encrypts the key per-user with HKDF + AES-256-GCM, and stores it in `ai_connections`.
 
 **Rate Limit**: `@Throttle` 5 requests/min.
 
 ### `POST /ai/preview-models`
 
-Validates an unsaved AI provider API key live and returns the discovered list of available models (`valid`, `maskedKey`, `models`) without persisting anything to the database.
+Validates an unsaved AI provider API key live and returns the discovered list of available models (`valid`, `maskedKey`, `suggestedLabel`, `expiresAt`, `models`) without persisting anything to the database.
 
 **Rate Limit**: `@Throttle` 10 requests/min.
 
@@ -212,7 +212,39 @@ Deletes a specific standup report by ID.
 
 ---
 
-## 6. Service-to-Service (S2S) Protocol
+## 6. Parabol Standup Integration
+
+### `GET /parabol/connections`
+
+Lists the user's connected Parabol PAT entries (`label`, `parabolName`, `parabolEmail`, `maskedPrefix`, `expiresAt`, `isActive`; never returns plaintext tokens).
+
+### `POST /parabol/verify-token`
+
+Validates an unsaved Parabol Personal Access Token live against `viewer` and returns profile metadata (`valid`, `suggestedLabel`, `name`, `email`, `maskedPrefix`, `expiresAt`, `teams`) without storing anything (`@Throttle` 10 req/min).
+
+### `POST /parabol/connections`
+
+Verifies a Parabol Personal Access Token against `viewer`, extracts any expiration metadata, encrypts it per-user via HKDF-SHA256 + AES-256-GCM, and saves it in `parabol_connections` (`@Throttle` 5 req/min).
+
+### `PATCH /parabol/connections/:id/active`
+
+Switches the active Parabol PAT connection for the authenticated user and clears cached standup meetings.
+
+### `DELETE /parabol/connections/:id`
+
+Deletes a saved Parabol connection and logs a `PARABOL_DISCONNECT` audit entry (`@Throttle` 5 req/min).
+
+### `GET /parabol/standups`
+
+Queries active Parabol Standup meetings (`TeamPromptMeeting` where `endedAt` is `null`) and their prompts. Supports optional `?meetingUrl=` lookup for direct meeting links.
+
+### `POST /parabol/standups/submit`
+
+Formats standup bullets as TipTap JSON and calls `upsertTeamPromptResponse` (defaults to Private Draft; optionally calls `shareTeamPromptResponses` when `shareImmediately: true`) (`@Throttle` 10 req/min).
+
+---
+
+## 7. Service-to-Service (S2S) Protocol
 
 Inbound S2S requests from Central Gateway or Wonderlab require:
 
