@@ -244,7 +244,27 @@ Formats standup bullets as TipTap JSON and calls `upsertTeamPromptResponse` (def
 
 ---
 
-## 7. Service-to-Service (S2S) Protocol
+## 7. Model Context Protocol (MCP) & Scoped Keys
+
+### `GET /mcp/keys`, `POST /mcp/keys`, `DELETE /mcp/keys/:id`
+
+Manages personal scoped MCP API keys (`gp_mcp_...`) for external IDE/Agent integrations (protected by `JwtAuthGuard`; key creation `@Throttle` 5 req/min). Plaintext tokens are returned once on `POST /mcp/keys` and stored exclusively as SHA-256 hashes in `mcp_api_keys`.
+
+### `POST /mcp` (Stateless Streamable HTTP JSON-RPC 2.0)
+
+Authenticated via `Authorization: Bearer gp_mcp_...` (`McpAuthGuard`, `@Throttle` 60 req/min). Exposes:
+
+- **GitHub Tools**: `get_github_status`, `get_github_workspaces`, `switch_active_github_account`, `get_github_activity`, `resolve_pull_request`.
+- **PR Task Group Tools**: `list_task_groups`, `create_task_group`, `batch_create_task_groups`, `update_task_group`, `delete_task_group`, `add_prs_to_task_group`, `remove_pr_from_task_group`, `sync_task_pr_states`.
+- **AI Summarization & Report Tools**: `list_ai_connections`, `check_ai_availability`, `summarize_prs_ai` (account BYOK Gemini/Groq), `save_report` (persists external agent summary as `MCP_AGENT`), `list_reports`, `get_report`, `delete_report`.
+- **Settings & Parabol Tools**: `get_user_settings`, `update_user_settings`, `list_parabol_connections`, `switch_active_parabol_connection`, `list_parabol_standups`, `submit_parabol_standup`.
+- **Resources & Prompts**: `gitpulse://activity/recent`, `gitpulse://tasks/active`, `gitpulse://reports/latest`, `gitpulse://settings/profile`, plus `create-task-from-current-prs` and `daily-standup-pipeline`.
+
+`GET /mcp` and `DELETE /mcp` return `405 Method Not Allowed` per stateless Streamable HTTP specification.
+
+---
+
+## 8. Service-to-Service (S2S) Protocol
 
 Inbound S2S requests from Central Gateway or Wonderlab require:
 

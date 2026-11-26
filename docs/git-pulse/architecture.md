@@ -120,3 +120,15 @@ Git Pulse integrates directly with **Parabol GraphQL API** (`https://action.para
    - `GET /api/v1/parabol/standups` lists active `TeamPromptMeeting` instances across the user's Parabol teams (or resolves a pasted `https://action.parabol.co/meet/<id>` link), cached per connection for 30s.
    - `POST /api/v1/parabol/standups/submit` serializes edited bullets (preserving `Today:` section framing) into Parabol's TipTap JSON format and calls `upsertTeamPromptResponse` (saving as a **Private Draft** by default, with an opt-in `shareImmediately` toggle that invokes `shareTeamPromptResponses`).
    - **Standup Output & Global UX**: `StandupOutputDock` stays visible with inline content-area loading skeletons and configurable quick-delivery actions; `ToastProvider` promotes notifications into the Top Layer (`popover="manual"` + `showPopover()`) anchored at top-right above active `<dialog>` modals; `CommandPalette` (`⌘K`) exposes quick commands for Git scans, commit selection, AI provider switching, Parabol submission, and unified settings.
+
+---
+
+## 6. Model Context Protocol (MCP) Server (`POST /api/v1/mcp`)
+
+Git Pulse exposes a **Stateless Streamable HTTP** MCP Server (`@modelcontextprotocol/sdk` `McpServer` + `StreamableHTTPServerTransport`) directly inside `git-pulse-server` (`server/src/mcp/`) so Vercel Serverless deployments and local development (`http://localhost:6101/api/v1/mcp`) share 100% of domain services with zero duplicated business logic:
+
+1. **Web vs. MCP Security Boundary**:
+   - Credential onboarding (Gateway SSO, GitHub PAT/OAuth, AI BYOK keys, Parabol PATs, and scoped `gp_mcp_...` API keys) stays strictly on the Web UI (`SettingsModal` -> **MCP & AI Agents**).
+   - Authenticated MCP clients (`Authorization: Bearer gp_mcp_...`) can execute day-to-day workflows: scanning GitHub activity, resolving PRs, creating/updating `TrackingTask` PR groups (`create_task_group`, `add_prs_to_task_group`, `sync_task_pr_states`), running dual-mode standup synthesis (`summarize_prs_ai` via account BYOK Gemini/Groq or `save_report` with `AiEngineType.MCP_AGENT`), updating non-secret `UserSettings`, and pushing drafts to Parabol (`submit_parabol_standup`).
+2. **Scoped Key Storage (`mcp_api_keys`)**:
+   - Raw `gp_mcp_...` tokens are displayed once at creation and stored solely as SHA-256 `tokenHash` digests with per-key scopes (`read:activity`, `write:activity`, `read:tasks`, `write:tasks`, `ai:summarize`, `read:reports`, `write:reports`, `read:settings`, `write:settings`, `write:parabol`) and optional expiration.

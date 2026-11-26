@@ -38,6 +38,7 @@ All logger streams, exception filters, and telemetry pipelines employ automated 
 - **OAuth Access Tokens**: `gho_[a-zA-Z0-9]{36}` -> `[REDACTED_GITHUB_TOKEN]`
 - **Personal AI Keys (`AIza...`, `sk-...`, `gsk_...`)**: Replaced with `[REDACTED_AI_KEY]` before logs or HTTP error responses.
 - **Parabol / Bearer Tokens (`pbl_...`, `pat_...`, `Bearer ...`)**: Replaced with `[REDACTED_PARABOL_TOKEN]` / `Bearer [REDACTED_TOKEN]` before logs or HTTP error responses.
+- **Scoped MCP API Keys (`gp_mcp_...`)**: Replaced with `[REDACTED_MCP_TOKEN]` before logs or HTTP error responses. Stored exclusively as SHA-256 `tokenHash` in `mcp_api_keys` (verified via `crypto.timingSafeEqual`) with explicit per-tool scope enforcement (`McpAuthGuard`).
 - Parabol Personal Access Tokens in `parabol_connections` use the same **AES-256-GCM + Per-User HKDF-SHA256** encryption vault as `git_accounts` and `ai_connections`.
 
 ---
@@ -67,5 +68,9 @@ All token state transitions trigger immutable audit logs:
 | `AI_KEY_PREVIEW`          | Unsaved AI key validated live            | IP address, User-Agent, Provider               |
 | `PARABOL_STANDUP_SUBMIT`  | Standup response pushed to Parabol       | Meeting ID, Shared flag, Status                |
 | `PARABOL_DISCONNECT`      | Parabol PAT permanently wiped            | IP address, User-Agent                         |
+| `MCP_KEY_CREATE`          | Scoped MCP key generated                 | Key label, granted scopes, IP, User-Agent      |
+| `MCP_KEY_REVOKE`          | MCP key revoked                          | Key label/ID, IP, User-Agent                   |
+| `MCP_TOOL_CALL`           | MCP tool invoked                         | Tool name, status, sanitized error if failed   |
+| `MCP_REPORT_SAVE`         | External agent summary saved             | Report ID, bullet count                        |
 
 Sensitive token values are strictly excluded from audit metadata.
