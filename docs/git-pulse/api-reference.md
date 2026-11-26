@@ -12,7 +12,7 @@ This document describes the public and internal REST API endpoints exposed by **
 
 ### `GET /health`
 
-Returns live service status, version, and database connectivity.
+Lightweight liveness probe (zero database or peer calls) returning live service status and version.
 
 **Response (200 OK)**:
 
@@ -20,11 +20,14 @@ Returns live service status, version, and database connectivity.
 {
   "status": "ok",
   "service": "git-pulse-server",
-  "database": "connected",
-  "version": "0.3.1",
-  "timestamp": "2026-11-17T17:07:06.606Z"
+  "version": "0.10.0",
+  "timestamp": "2026-11-26T12:00:00.000Z"
 }
 ```
+
+### `GET /health-full`
+
+Deep readiness probe verifying local PostgreSQL (`SELECT 1`) and active `service_connections`. Returns HTTP `200 OK` when the local service and database are healthy (even if a peer connection is degraded/unreachable), and HTTP `503 Service Unavailable` only when the local database check fails.
 
 ---
 

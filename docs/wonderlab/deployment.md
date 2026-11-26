@@ -52,7 +52,7 @@ graph TD
 - **Root Directory**: `server`
 - **Framework**: NestJS
 - **Build Command**: `prisma generate && (if [ -n "$DATABASE_URL" ]; then prisma migrate deploy; fi) && nest build`
-- **Health Check Path**: `/api/v1/health`
+- **Health Check Paths**: `/api/v1/health` (liveness) and `/api/v1/health-full` (readiness + DB + peer connections)
 - **Key Environment Variables**:
   - `NODE_ENV`: `production`
   - `DATABASE_URL`: Connection string to Neon PostgreSQL pooler
@@ -94,7 +94,7 @@ flowchart TD
 
 1. **Deployment Initiation**: Triggered via Vercel Deploy Hooks using `VERCEL_SERVER_DEPLOY_HOOK` and `VERCEL_CLIENT_DEPLOY_HOOK`.
 2. **Real-time Observability**: Immediately registers GitHub Deployments for `main - wonderlab-server` and `main - wonderlab-client` with `state: in_progress`.
-3. **Health Verification**: Runs `scripts/verify-deployment.sh` to poll live health endpoints (`https://wonderlab.io.vn/health` and `https://wonderlab-server.vercel.app/api/v1/health`).
+3. **Health Verification**: Runs `scripts/verify-deployment.sh` to poll live health endpoints (`https://wonderlab.io.vn/health` and `https://wonderlab-server.vercel.app/api/v1/health-full`).
 4. **Resolution**: As each service becomes healthy, its corresponding GitHub Deployment transitions to `success` 🟢.
 5. **Slack Alerts**: Posts rich notifications to `#deployments` at deployment start and resolution.
 
@@ -104,6 +104,7 @@ flowchart TD
 
 - [ ] Confirm `https://wonderlab.io.vn` renders cleanly via Vercel with HTTP 200 and valid SSL.
 - [ ] Confirm `https://wonderlab.io.vn/health` returns `{"status":"ok","service":"wonderlab-client"}`.
-- [ ] Confirm `https://wonderlab-server.vercel.app/api/v1/health` returns `{"status":"ok","database":"connected"}`.
+- [ ] Confirm `https://wonderlab-server.vercel.app/api/v1/health` returns `{"status":"ok","service":"wonderlab-server"}`.
+- [ ] Confirm `https://wonderlab-server.vercel.app/api/v1/health-full` returns HTTP 200 with `"database":"connected"`.
 - [ ] Confirm S2S authentication succeeds with Central Gateway.
 - [ ] Confirm live GitHub Deployments report `success` 🟢.

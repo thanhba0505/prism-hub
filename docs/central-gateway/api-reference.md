@@ -121,7 +121,8 @@ Content-Type: application/json
 
 | Method | Endpoint                        | Description                                          |
 | :----- | :------------------------------ | :--------------------------------------------------- |
-| `GET`  | `/api/v1/health`                | Health probe (Liveness & Readiness)                  |
+| `GET`  | `/api/v1/health`                | Lightweight liveness probe (no DB query)             |
+| `GET`  | `/api/v1/health-full`           | Deep readiness probe (DB + active peer connections)  |
 | `GET`  | `/api/v1/projects`              | List all registered projects and channel mappings    |
 | `POST` | `/api/v1/projects`              | Register a new project                               |
 | `PUT`  | `/api/v1/projects/:id/channels` | Update project channel mappings                      |

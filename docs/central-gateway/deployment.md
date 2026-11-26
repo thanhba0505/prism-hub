@@ -39,7 +39,7 @@ flowchart TD
 - **Framework**: NestJS 10, Prisma ORM
 - **Production URL**: [central-gateway-server.vercel.app/api/v1](https://central-gateway-server.vercel.app/api/v1)
 - **Swagger Docs**: [central-gateway-server.vercel.app/api/docs](https://central-gateway-server.vercel.app/api/docs)
-- **Health Check**: `/api/v1/health`
+- **Health Check**: `/api/v1/health` (liveness) & `/api/v1/health-full` (readiness + DB + peer connections)
 
 ### 3. Database Layer
 
@@ -64,6 +64,6 @@ The deployment pipeline executes `scripts/verify-deployment.sh` to poll live hea
 ```
 
 1. **Initialization**: Immediately registers GitHub Deployments for `main - central-gateway-server` and `main - central-gateway-client` with `state: in_progress` ⏳.
-2. **Health Verification**: Periodically probes `/api/v1/health` and `/health` until HTTP 200 and version matching are confirmed.
+2. **Health Verification**: Periodically probes `/api/v1/health-full` (server DB readiness) and `/health` (client) until HTTP 200 and version matching are confirmed.
 3. **Success Transition**: Transitions environment status to `success` 🟢 upon verified rollout.
 4. **Failure Safeguard**: On timeout or build error, marks environment status `failure` ❌ and dispatches an alert to Slack `#deployments`.

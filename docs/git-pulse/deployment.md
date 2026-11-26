@@ -45,7 +45,7 @@ flowchart TD
 - **Region**: `iad1` (Washington, D.C.)
 - **Production URL**: [git-pulse-server.vercel.app/api/v1](https://git-pulse-server.vercel.app/api/v1)
 - **OpenAPI Swagger**: [git-pulse-server.vercel.app/api/docs](https://git-pulse-server.vercel.app/api/docs)
-- **Health Check**: `/api/v1/health` ([git-pulse-server.vercel.app/api/v1/health](https://git-pulse-server.vercel.app/api/v1/health))
+- **Health Check**: `/api/v1/health` (liveness) & `/api/v1/health-full` (readiness + DB + peer connections) ([git-pulse-server.vercel.app/api/v1/health](https://git-pulse-server.vercel.app/api/v1/health))
 - **Environment Variables**:
   - `DATABASE_URL`: Neon Lakebase PostgreSQL connection pooler
   - `JWT_SECRET`: High-entropy 256-bit token signing secret
@@ -73,8 +73,8 @@ Rather than a single opaque commit status, Git Pulse tracks deployment progress 
 
 1. **`main - git-pulse-server`**:
    - Initialized as `in_progress` with an active loading spinner ⏳ as soon as deployment is invoked.
-   - Points to `https://git-pulse-server.vercel.app/api/v1/health`.
-   - Transitions to `success` 🟢 once backend health verifies database connectivity (`SELECT 1`).
+   - Points to `https://git-pulse-server.vercel.app/api/v1/health-full`.
+   - Transitions to `success` 🟢 once backend deep health verifies database connectivity (`SELECT 1`).
 
 2. **`main - git-pulse-client`**:
    - Initialized as `in_progress` ⏳ concurrently with frontend build queue.

@@ -51,8 +51,9 @@ server/
 │   │   └── simulations.module.ts
 │   ├── health/
 │   │   ├── dto/
-│   │   │   └── health-response.dto.ts  # Standardized response contract
-│   │   ├── health.controller.ts        # GET /api/v1/health
+│   │   │   └── health-response.dto.ts  # HealthResponseDto & FullHealthResponseDto
+│   │   ├── health.controller.ts        # GET /api/v1/health & GET /api/v1/health-full
+│   │   ├── health.service.ts           # Liveness probe + DB & peer connection checks
 │   │   ├── health.controller.spec.ts   # Unit test
 │   │   └── health.module.ts
 │   ├── app.module.ts                   # Root application module
@@ -67,28 +68,27 @@ server/
 
 ---
 
-## 3. Health Endpoint Contract
+## 3. Health Endpoint Contracts
 
-### `GET /api/v1/health`
+### `GET /api/v1/health` (Lightweight Liveness Probe)
 
-**Success Response (200 OK)**:
+Zero database queries and zero external calls (also aliased at `/health` and `/`). Always returns HTTP `200 OK` while the process is alive:
 
 ```json
 {
   "status": "ok",
   "service": "wonderlab-server",
-  "database": "connected",
-  "timestamp": "2026-11-07T07:47:23.318Z",
-  "version": "0.13.1",
+  "timestamp": "2026-11-26T12:00:00.000Z",
+  "version": "0.22.0",
   "commit": "6ce7a4f49271dc10a6110f55ef2b3280cbd8c37c"
 }
 ```
 
-### Guarantees:
+### `GET /api/v1/health-full` (Deep Readiness & Peer Probe)
 
-- Validates active database connectivity against PostgreSQL / Neon.
-- Never exposes internal stack traces, filesystem paths, or database credentials.
-- Utilized by Render, Kubernetes, or container orchestrators as a liveness and readiness probe.
+Checks PostgreSQL (`SELECT 1`) and probes all active `service_connections` (also aliased at `/health-full`):
+- **HTTP `200 OK`**: Local service and database are healthy (`status: "ok"` when all peers succeed, or `"degraded"` when any peer connection fails).
+- **HTTP `503 Service Unavailable`**: Local database check failed (`status: "error"`, `database: "disconnected"`).
 
 ---
 
