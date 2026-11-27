@@ -123,6 +123,19 @@ Content-Type: application/json
 | :----- | :------------------------------ | :--------------------------------------------------- |
 | `GET`  | `/api/v1/health`                | Lightweight liveness probe (no DB query)             |
 | `GET`  | `/api/v1/health-full`           | Deep readiness probe (DB + active peer connections)  |
+| `GET`  | `/api/v1/cron/status`           | Cron Broker status, folder naming & allowed services |
+| `GET`  | `/api/v1/cron/folders`          | List cached `cron-job.org` folders (`prism-hub-*`)   |
+| `POST` | `/api/v1/cron/folders/sync`     | Create/sync folders on `cron-job.org` for services   |
+| `GET`  | `/api/v1/cron/jobs`             | List registered cron jobs (scoped for S2S callers)   |
+| `POST` | `/api/v1/cron/jobs`             | Upsert cron job into service-scoped folder           |
+| `PATCH` | `/api/v1/cron/jobs/:id`        | Update cron schedule, path, or toggle `enabled`      |
+| `DELETE` | `/api/v1/cron/jobs/:id`       | Delete cron job from `cron-job.org` and DB           |
+| `GET`  | `/api/v1/cron/jobs/:id/history` | Fetch execution history from `cron-job.org`          |
+| `POST` | `/api/v1/cron/jobs/:id/trigger` | Trigger cron endpoint directly from Gateway          |
+| `GET`  | `/api/v1/platform-links`        | List platform & external service directory links     |
+| `POST` | `/api/v1/platform-links`        | Create a new platform directory link                 |
+| `PATCH` | `/api/v1/platform-links/:id`   | Update a platform directory link                     |
+| `DELETE` | `/api/v1/platform-links/:id`  | Delete a platform directory link                     |
 | `GET`  | `/api/v1/projects`              | List all registered projects and channel mappings    |
 | `POST` | `/api/v1/projects`              | Register a new project                               |
 | `PUT`  | `/api/v1/projects/:id/channels` | Update project channel mappings                      |
